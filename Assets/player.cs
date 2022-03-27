@@ -1,20 +1,20 @@
 using UnityEngine;
-using UnityEngine.UI;
 
 public class player : MonoBehaviour
 {
     public GameObject hole;
     public GameObject sprite;
 
-    float posX = 0;
-    float posY = 0;
-    float move = 0;
+    float posX = 0f;
+    float posY = 0f;
+    float moveX = 0;
+    float moveY = 0f;
+    float maxMove = 4.2f;
 
     Vector3 pos;
     float distance;
     float damage = 0f;
-    float time = 0f;
-    float color = 255f;
+    float health = 255f;
     void Start()
     {
         Cursor.visible = false;
@@ -22,27 +22,31 @@ public class player : MonoBehaviour
 
     void Update()
     {
-        move = Input.GetAxis("Mouse Y");
-        if (posY+move > -4.5 && posY+move <= 4.5)
+        moveY = Input.GetAxis("Mouse Y");
+        if (posY+moveY > -maxMove && posY+moveY <= maxMove)
         {
-            posY += move;
+            posY += moveY/2;
+        }
+        if (moveX < -.0001)
+        {
+            posX += moveX*Time.deltaTime;
+            moveX -= moveX*Time.deltaTime;
         }
         distance = Vector2.Distance(transform.position, hole.transform.position) -12;
+        if (distance < 5f && health > 0)
+        {
+            getDamage();
+        }
+        if (health <= 0)
+        {
+            gameOver();
+        }
     }
 
     void FixedUpdate()
     {
-        time += Time.deltaTime;
-        if (distance < 5f && color > 0)
-        {
-            getDamage();
-        } 
-        if (time >= 1f)
-        {
-            time -= 1f;
-        }
         pos = new Vector2 (posX, posY);
-        if (posY > -4.5 && posY < 4.5)
+        if (posY > -maxMove && posY < maxMove)
         {
             transform.position = pos;
         }
@@ -54,11 +58,21 @@ public class player : MonoBehaviour
         damage += (5f-distance)*Time.deltaTime;
         if (damage >= 1f)
         {
-            color -= 1f;
+            health -= 1f;
             damage -= 1f;
             renderer = sprite.GetComponent<SpriteRenderer>();
-            renderer.color = new Color (0, 0, color/255f);
+            renderer.color = new Color (0, 0, health/255f);
         }
-        // game_over();
+    }
+
+    public void takeDamage()
+    {
+        health -= 5f;
+        moveX -= .5f;
+    }
+
+    void gameOver()
+    {
+        
     }
 }

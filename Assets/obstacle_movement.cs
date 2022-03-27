@@ -1,24 +1,34 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class obstacle_movement : MonoBehaviour
 {
-    float time;
-    float posY = 0;
+    public GameObject self;
+    public float speed;
+    float move;
+
     void Start()
     {
-        
+        speed = 4;
     }
 
     void Update()
     {
-        time += Time.deltaTime;
-        posY = Mathf.Sin(time)*4.5f;
-        if (time > 6.2831f)
+        move = -speed/transform.localScale.x * Time.deltaTime;
+        transform.Translate(move, 0, 0);
+        if (transform.position.x < -10)
         {
-            time -= 6.2831f;
+            Destroy(self);
         }
-        transform.position = new Vector3(10, posY, 0);
     }
+
+    void OnCollisionEnter2D(Collision2D col)
+    {
+        if (col.transform.CompareTag("Player"))
+        {
+            player blue = col.transform.GetComponent<player>();
+            blue.takeDamage();
+            Destroy(self);
+        }
+    }
+
 }
